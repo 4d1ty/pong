@@ -16,5 +16,7 @@ add_executable(main src/main.cpp)
 target_compile_features(main PRIVATE cxx_std_20)
 target_link_libraries(main PRIVATE SFML::Graphics)
 target_link_libraries(main PRIVATE SFML::Audio)
+set_target_properties(main PROPERTIES OUTPUT_NAME "pong")
+
 file(COPY_FILE ${CMAKE_CURRENT_SOURCE_DIR}/src/BoldPixels.ttf ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/BoldPixels.ttf)
 file(COPY_FILE ${CMAKE_CURRENT_SOURCE_DIR}/src/pong.wav ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/pong.wav)
