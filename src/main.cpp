@@ -39,6 +39,7 @@ int main()
 
 	sf::Vector2f paddleSize({ 40.f, 200.f });
 	float speed = 1500.f;
+	float computerSpeed = 500.f;
 
 	sf::RectangleShape playerPaddle(paddleSize);
 	// Initial Position of the playerPaddle.
@@ -81,6 +82,7 @@ int main()
 		playerPaddle.setPosition({ 0.f, currentPlayerY });
 		computerPaddle.setPosition({ static_cast<float>(screenX - paddleSize.x), computerCurrentY });
 
+		// Player movement
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up)) {
 			playerPaddle.move({ 0.f, -speed * dt });
 		}
@@ -95,25 +97,50 @@ int main()
 		const sf::FloatRect compBounds = computerPaddle.getGlobalBounds();
 		const sf::FloatRect playerBounds = playerPaddle.getGlobalBounds();
 
+		float playerCenterY = playerBounds.getCenter().y;
+		float computerCenterY = compBounds.getCenter().y;
+		float ballCenterY = ballBounds.getCenter().y;
+
 		// Top and bottom screen collision
-		if (ballBounds.position.y > screenY - ballBounds.size.y || ballBounds.position.y < 0.f) {
+		if (ballBounds.position.y + ballBounds.size.y > screenY ||
+			ballBounds.position.y < 0.f) {
 			ballVelocity.y = -ballVelocity.y;
 		}
 
 		// Paddle Collision
 		if (ballBounds.findIntersection(playerBounds) || ballBounds.findIntersection(compBounds)) {
 			ballVelocity.x = -ballVelocity.x;
+
+			// Add spin based on where ball hits paddle
+			if (ballBounds.findIntersection(playerBounds)) {
+				float hitPos = (ballCenterY - playerCenterY) / (playerBounds.size.y / 2.f);
+				ballVelocity.y += hitPos * 200.f;
+			}
+			else if (ballBounds.findIntersection(compBounds)) {
+				float hitPos = (ballCenterY - computerCenterY) / (compBounds.size.y / 2.f);
+				ballVelocity.y += hitPos * 200.f;
+			}
 		}
 
-		// Computer Movement
-		if (ballVelocity.x > 1) {
-			if (ballVelocity.y > 1) {
-				computerPaddle.move({ 0.f, speed * dt });
+		// Computer Movement - Simple AI
+		float paddleSpeed = 250.f;
+		if (ballVelocity.x > 0) {  // Ball moving toward computer (right side)
+			if (ballCenterY < computerCenterY - 10.f) {
+				computerPaddle.move({ 0.f, -paddleSpeed * dt });
 			}
-			else if (ballVelocity.y < 1) {
-				computerPaddle.move({ 0.f, -speed * dt });
+			else if (ballCenterY > computerCenterY + 10.f) {
+				computerPaddle.move({ 0.f, paddleSpeed * dt });
 			}
 		}
+
+		// Keep computer paddle in bounds
+		if (compBounds.position.y < 0.f) {
+			computerPaddle.setPosition({ compBounds.position.x, 0.f });
+		}
+		if (compBounds.position.y + compBounds.size.y > screenY) {
+			computerPaddle.setPosition({ compBounds.position.x, screenY - compBounds.size.y });
+		}
+
 
 		if (ball.getPosition().x > screenX + 50) {
 			playerScore++;
