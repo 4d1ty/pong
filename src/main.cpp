@@ -55,7 +55,7 @@ int main()
 	ball.setOrigin(ball.getGeometricCenter());
 	ball.setPosition({ static_cast<float>(screenX / 2), static_cast<float>(screenY / 2) });
 	sf::Angle ballPhi = sf::degrees(degree_range(gen));
-	sf::Vector2f ballVelocity({ 500.f, sf::Angle(ballPhi) });
+	sf::Vector2f ballVelocity({ 800.f, sf::Angle(ballPhi) });
 
 	while (window.isOpen())
 	{
@@ -147,12 +147,14 @@ int main()
 			playerScoreText.setString(std::to_string(playerScore));
 			ball.setPosition({ static_cast<float>(screenX / 2), static_cast<float>(screenY / 2) });
 			ballVelocity.x = -ballVelocity.x;
+			ballVelocity.y = sf::degrees(degree_range(gen)).asRadians() - ballVelocity.y;
 		}
 		else if (ball.getPosition().x < -50) {
 			computerScore++;
 			computerScoreText.setString(std::to_string(computerScore));
 			ball.setPosition({ static_cast<float>(screenX / 2), static_cast<float>(screenY / 2) });
 			ballVelocity.x = -ballVelocity.x;
+			ballVelocity.y = sf::degrees(degree_range(gen)).asRadians() - ballVelocity.y;
 		}
 
 		window.clear();
